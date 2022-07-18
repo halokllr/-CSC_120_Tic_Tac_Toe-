@@ -1,5 +1,17 @@
-from tokenize import String
+import datetime
+import sqlite3
 
+dbConnect = sqlite3.connect('game.sqlite')
+
+cur = dbConnect.cursor()
+
+try:
+    cur.execute('CREATE TABLE gameStats (date string, winner string)')
+    dbConnect.commit()
+
+
+except sqlite3.OperationalError:
+    print("Table already exists")
 
 board = [['_','_','_'],
          ['_','_','_'],
@@ -68,9 +80,19 @@ def check_win(player):
 def show_winner(playerNumber):
     message = "Player {} wins!"
     print(message.format(playerNumber))
+    add_to_db(playerNumber)
 
 def tie_game():
     print("It's a tie, nobody wins")
+
+def add_to_db(player):
+    insertMessage = "INSERT INTO gameStats VALUES (\"{0}\", \"{1}\")"
+    today = str(datetime.date.today())
+    playerName = "Player " + str(player)
+    print(today)
+    print(insertMessage.format(today, playerName))
+    cur.execute(insertMessage.format(today, playerName))
+    dbConnect.commit()
 
 
 playingGame = True
